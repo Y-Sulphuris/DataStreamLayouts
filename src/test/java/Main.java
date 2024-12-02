@@ -1,8 +1,6 @@
 import com.ydo4ki.datalayouts.Layout;
 import com.ydo4ki.datalayouts.StringEncoding;
-import com.ydo4ki.datalayouts.annotations.Encoding;
-import com.ydo4ki.datalayouts.annotations.Length;
-import com.ydo4ki.datalayouts.annotations.NullTerminated;
+import com.ydo4ki.datalayouts.annotations.*;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
@@ -41,13 +39,12 @@ class PacketExample {
 	// FINALLY
 	// so now we can create any custom annotation and use it to specify serialization rules
 	@Encoding(StringEncoding.UTF8)
-	//@NullTerminated // yeeey it works too
-	@Length(8) // YEEEEEEY IT WORKS TOOOOO
+	@NullTerminated // yeeey it works too
+	//@Length(4) // YEEEEEEY IT WORKS TOOOOO
 	// works perfectly
 	// yes
 	// that's it i'm happy
 	public final String name;
-	
 	
 	
 	public final int code;

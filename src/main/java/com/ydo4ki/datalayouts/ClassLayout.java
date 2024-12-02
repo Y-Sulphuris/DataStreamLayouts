@@ -135,22 +135,22 @@ class ClassLayout<T> implements Layout.Of<T> {
 	
 	
 	private static void write(Layout<?> layout, Object x, MethodHandle getter, DataOutput out) throws Throwable {
-		if (layout == Layout.ofBoolean) {
-			Layout.ofBoolean.write((boolean)getter.invoke(x), out);
-		} else if (layout == Layout.ofByte) {
-			Layout.ofByte.write((byte)getter.invoke(x), out);
-		} else if (layout == Layout.ofShort) {
-			Layout.ofShort.write((short)getter.invoke(x), out);
-		} else if (layout == Layout.ofChar) {
-			Layout.ofChar.write((char)getter.invoke(x), out);
-		} else if (layout == Layout.ofFloat) {
-			Layout.ofFloat.write((float)getter.invoke(x), out);
-		} else if (layout == Layout.ofInt) {
-			Layout.ofInt.write((int)getter.invoke(x), out);
-		} else if (layout == Layout.ofLong) {
-			Layout.ofLong.write((long)getter.invoke(x), out);
-		} else if (layout == Layout.ofDouble) {
-			Layout.ofDouble.write((double)getter.invoke(x), out);
+		if (layout instanceof Layout.OfBoolean) {
+			((OfBoolean) layout).write((boolean)getter.invoke(x), out);
+		} else if (layout instanceof Layout.OfByte) {
+			((OfByte) layout).write((byte)getter.invoke(x), out);
+		} else if (layout instanceof Layout.OfShort) {
+			((OfShort) layout).write((short)getter.invoke(x), out);
+		} else if (layout instanceof Layout.OfChar) {
+			((OfChar) layout).write((char)getter.invoke(x), out);
+		} else if (layout instanceof Layout.OfFloat) {
+			((OfFloat) layout).write((float)getter.invoke(x), out);
+		} else if (layout instanceof Layout.OfInt) {
+			((OfInt) layout).write((int)getter.invoke(x), out);
+		} else if (layout instanceof Layout.OfLong) {
+			((OfLong) layout).write((long)getter.invoke(x), out);
+		} else if (layout instanceof Layout.OfDouble) {
+			((OfDouble) layout).write((double)getter.invoke(x), out);
 		} else if (layout instanceof Layout.Of) {
 			//noinspection rawtypes,unchecked,bruh
 			((Layout.Of)layout).write(getter.invoke(x), out);
@@ -158,22 +158,22 @@ class ClassLayout<T> implements Layout.Of<T> {
 	}
 	
 	private static void read(Layout<?> layout, Object x, MethodHandle setter, DataInput in) throws Throwable {
-		if (layout == Layout.ofBoolean) {
-			setter.invoke(x, Layout.ofBoolean.read(in));
-		} else if (layout == Layout.ofByte) {
-			setter.invoke(x, Layout.ofByte.read(in));
-		} else if (layout == Layout.ofShort) {
-			setter.invoke(x, Layout.ofShort.read(in));
-		} else if (layout == Layout.ofChar) {
-			setter.invoke(x, Layout.ofChar.read(in));
-		} else if (layout == Layout.ofFloat) {
-			setter.invoke(x, Layout.ofFloat.read(in));
-		} else if (layout == Layout.ofInt) {
-			setter.invoke(x, Layout.ofInt.read(in));
-		} else if (layout == Layout.ofLong) {
-			setter.invoke(x, Layout.ofLong.read(in));
-		} else if (layout == Layout.ofDouble) {
-			setter.invoke(x, Layout.ofDouble.read(in));
+		if (layout instanceof Layout.OfBoolean) {
+			setter.invoke(x, ((OfBoolean) layout).read(in));
+		} else if (layout instanceof Layout.OfByte) {
+			setter.invoke(x, ((OfByte) layout).read(in));
+		} else if (layout instanceof Layout.OfShort) {
+			setter.invoke(x, ((OfShort) layout).read(in));
+		} else if (layout instanceof Layout.OfChar) {
+			setter.invoke(x, ((OfChar) layout).read(in));
+		} else if (layout instanceof Layout.OfFloat) {
+			setter.invoke(x, ((OfFloat) layout).read(in));
+		} else if (layout instanceof Layout.OfInt) {
+			setter.invoke(x, ((OfInt) layout).read(in));
+		} else if (layout instanceof Layout.OfLong) {
+			setter.invoke(x, ((OfLong) layout).read(in));
+		} else if (layout instanceof Layout.OfDouble) {
+			setter.invoke(x, ((OfDouble) layout).read(in));
 		} else if (layout instanceof Layout.Of) {
 			//noinspection rawtypes,bruh
 			setter.invoke(x, ((Layout.Of)layout).read(in));

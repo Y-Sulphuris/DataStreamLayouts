@@ -1,9 +1,10 @@
 package com.ydo4ki.datalayouts;
 
-import com.ydo4ki.datalayouts.annotations.Encoding;
-import com.ydo4ki.datalayouts.annotations.Length;
-import com.ydo4ki.datalayouts.annotations.NullTerminated;
+import com.ydo4ki.datalayouts.annotations.*;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
@@ -91,6 +92,7 @@ class Layouts {
 	
 	// func type = Layout<T>(Class<?> targetType, T annotationItself)
 	static <A extends Annotation> void registerAnnotation(Class<A> annotationType, AnnotationPragma<A,?,?> pragma) {
+		if (annotations.containsKey(annotationType)) throw new IllegalArgumentException("This annotation is already registered");
 		annotations.put(annotationType, pragma);
 	}
 	
@@ -133,6 +135,8 @@ class Layouts {
 		Layout.bindAnnotationPragma(Encoding.class, Layouts::getEncodingLayout);
 		Layout.bindAnnotationPragma(NullTerminated.class, Layouts::getNullTerminatedLayout);
 		Layout.bindAnnotationPragma(Length.class, Layouts::getLengthLayout);
+		Layout.bindAnnotationPragma(UnsignedByte.class, Layouts::getUnsignedByteLayout);
+		Layout.bindAnnotationPragma(UnsignedShort.class, Layouts::getUnsignedShortLayout);
 	}
 	
 	private static StringLayout getEncodingLayout(StringLayout l, Encoding encoding, Class<String> cls) {
@@ -153,5 +157,35 @@ class Layouts {
 		if (!(l instanceof StringLayout.StaticStringLayout) || cls != String.class)
 			throw new IllegalArgumentException("Incomparable annotation: " + length);
 		return ((StringLayout.StaticStringLayout)l).updateLength(length.value());
+	}
+	
+	private static Layout<Integer> getUnsignedByteLayout(Layout<Integer> l, UnsignedByte annotation, Class<Integer> cls) {
+		if (cls == int.class && l instanceof Layout.OfInt) return new Layout.OfInt() {
+			@Override
+			public int read(DataInput in) throws IOException {
+				return in.readUnsignedByte();
+			}
+			
+			@Override
+			public void write(int x, DataOutput out) throws IOException {
+				out.writeByte(x);
+			}
+		};
+		throw new IllegalArgumentException("Incomparable annotation: " + annotation);
+	}
+	
+	private static Layout<Integer> getUnsignedShortLayout(Layout<Integer> l, UnsignedShort annotation, Class<Integer> cls) {
+		if (cls == int.class && l instanceof Layout.OfInt) return new Layout.OfInt() {
+			@Override
+			public int read(DataInput in) throws IOException {
+				return in.readUnsignedShort();
+			}
+			
+			@Override
+			public void write(int x, DataOutput out) throws IOException {
+				out.writeShort(x);
+			}
+		};
+		throw new IllegalArgumentException("Incomparable annotation: " + annotation);
 	}
 }

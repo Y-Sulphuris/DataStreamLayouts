@@ -16,7 +16,10 @@ final class StaticArrayLayout<T> extends DynamicArrayLayout<T> {
 	
 	@Override
 	public void write(T array, DataOutput out) throws IOException {
-		super.write(copyOf(array, length), out);
+		array = copyOf(array, length);
+		for (int i = 0, Len = Array.getLength(array); i < Len; i++) {
+			elementLayout.asObjectLayout().write(Array.get(array, i), out);
+		}
 	}
 	
 	private static <T> T copyOf(T array, int newLength) {

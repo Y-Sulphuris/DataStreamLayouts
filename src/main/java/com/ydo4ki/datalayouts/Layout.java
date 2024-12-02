@@ -94,7 +94,7 @@ public interface Layout<T> {
 	}
 	
 	class OfByte implements Layout<Byte> {
-		OfByte() {
+		public OfByte() {
 		}
 		
 		@Override
@@ -140,7 +140,7 @@ public interface Layout<T> {
 	}
 	
 	class OfBoolean implements Layout<Boolean> {
-		OfBoolean() {
+		public OfBoolean() {
 		}
 		
 		@Override
@@ -186,7 +186,7 @@ public interface Layout<T> {
 	}
 	
 	class OfShort implements Layout<Short> {
-		OfShort() {
+		public OfShort() {
 		}
 		
 		@Override
@@ -231,7 +231,7 @@ public interface Layout<T> {
 	}
 	
 	class OfChar implements Layout<Character> {
-		OfChar() {
+		public OfChar() {
 		}
 		
 		@Override
@@ -276,7 +276,7 @@ public interface Layout<T> {
 	}
 	
 	class OfInt implements Layout<Integer> {
-		OfInt() {
+		public OfInt() {
 		}
 		
 		@Override
@@ -321,7 +321,7 @@ public interface Layout<T> {
 	}
 	
 	class OfFloat implements Layout<Float> {
-		OfFloat() {
+		public OfFloat() {
 		}
 		
 		@Override
@@ -367,7 +367,7 @@ public interface Layout<T> {
 	}
 	
 	class OfLong implements Layout<Long> {
-		OfLong() {
+		public OfLong() {
 		}
 		
 		@Override
@@ -413,7 +413,7 @@ public interface Layout<T> {
 	}
 	
 	class OfDouble implements Layout<Double> {
-		OfDouble() {
+		public OfDouble() {
 		}
 		
 		@Override
