@@ -1,6 +1,7 @@
 package com.ydo4ki.datalayouts;
 
 import com.ydo4ki.datalayouts.annotations.Encoding;
+import com.ydo4ki.datalayouts.annotations.Length;
 import com.ydo4ki.datalayouts.annotations.NullTerminated;
 
 import java.lang.annotation.Annotation;
@@ -131,18 +132,26 @@ class Layouts {
 		// well now it starts working
 		Layout.bindAnnotationPragma(Encoding.class, Layouts::getEncodingLayout);
 		Layout.bindAnnotationPragma(NullTerminated.class, Layouts::getNullTerminatedLayout);
+		Layout.bindAnnotationPragma(Length.class, Layouts::getLengthLayout);
 	}
 	
 	private static StringLayout getEncodingLayout(StringLayout l, Encoding encoding, Class<String> cls) {
 		//noinspection DataFlowIssue
 		if (!(l instanceof StringLayout) || cls != String.class)
-			throw new IllegalArgumentException("Invalid class or invalid string layout or invalid idk what, encoding is unsupported here anyways");
+			throw new IllegalArgumentException("Incomparable annotation: " + encoding);
 		return l.updateEncoding(StringEncoding.get(encoding.value()));
 	}
 	private static StringLayout getNullTerminatedLayout(StringLayout l, NullTerminated nullTerminated, Class<String> cls) {
-		//noinspection DataFlowIssue
-		if (!(l instanceof StringLayout) || cls != String.class)
-			throw new IllegalArgumentException("Invalid class or invalid string layout or invalid idk what, null-terminated is unsupported here anyways");
-		return l.updateNullTerminated(nullTerminated.value());
+		if (!(l instanceof StringLayout.DynamicStringLayout) || cls != String.class)
+			throw new IllegalArgumentException("Incomparable annotation: " + nullTerminated);
+		return ((StringLayout.DynamicStringLayout)l).updateNullTerminated(nullTerminated.value());
+	}
+	private static StringLayout getLengthLayout(StringLayout l, Length length, Class<String> cls) {
+		if (l instanceof StringLayout.DynamicStringLayout && !((StringLayout.DynamicStringLayout) l).isNullTerminated()) {
+			return l.toStaticLen(length.value());
+		}
+		if (!(l instanceof StringLayout.StaticStringLayout) || cls != String.class)
+			throw new IllegalArgumentException("Incomparable annotation: " + length);
+		return ((StringLayout.StaticStringLayout)l).updateLength(length.value());
 	}
 }

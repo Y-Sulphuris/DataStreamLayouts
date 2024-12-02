@@ -50,7 +50,7 @@ public interface Layout<T> {
 	Layout.OfLong    ofLong    = new OfLong();
 	Layout.OfDouble  ofDouble  = new OfDouble();
 	
-	Layout.Of<String>ofString  = new StringLayout(StringEncoding.get(StringEncoding.UTF16), false);
+	Layout.Of<String>ofString  = new StringLayout.DynamicStringLayout(StringEncoding.get(StringEncoding.UTF16), false);
 	
 	
 	// nullable (null means unknown or dynamic size)
