@@ -20,8 +20,8 @@ class ClassLayout<T> implements Layout.Of<T> {
 	private final MethodHandle contructor;
 	private final MethodHandle[] getters;
 	private final MethodHandle[] setters;
-	private final Layout[] fieldLayouts;
-	private final int sizeof;
+	private final Layout<?>[] fieldLayouts;
+	private final Integer sizeof;
 	
 	public int fieldsCount() {
 		return fieldLayouts.length;
@@ -42,15 +42,21 @@ class ClassLayout<T> implements Layout.Of<T> {
 		
 		this.fieldLayouts = toLayouts(fields);
 		
-		int size = 0;
-		for (Layout fieldLayout : fieldLayouts)
-			size += fieldLayout.size();
+		Integer size = 0;
+		for (Layout<?> fieldLayout : fieldLayouts) {
+			Integer fieldSize = fieldLayout.size();
+			if (fieldSize == null) {
+				size = null;
+				break;
+			}
+			size += fieldSize;
+		}
 		
 		this.sizeof = size;
 	}
 	
-	private static Layout[] toLayouts(ArrayList<Field> fields) {
-		Layout[] layouts = new Layout[fields.size()];
+	private static Layout<?>[] toLayouts(ArrayList<Field> fields) {
+		Layout<?>[] layouts = new Layout[fields.size()];
 		for (int i = 0; i < fields.size(); i++) {
 			Class<?> type = fields.get(i).getType();
 			layouts[i] = Layout.of(Objects.requireNonNull(type));
@@ -96,8 +102,17 @@ class ClassLayout<T> implements Layout.Of<T> {
 	private static final Map<Class<?>, Layout.Of<?>> layouts = new HashMap<>();
 	
 	@SuppressWarnings("unchecked")
-	public static <T> Layout.Of<T> get(Class<T> clazz, MethodHandles.Lookup lookup) { // but still
-		return (Layout.Of<T>) layouts.computeIfAbsent(Objects.requireNonNull(clazz), (cls) -> new ClassLayout<>(cls, lookup));
+	static <T> Layout.Of<T> get(Class<T> clazz, MethodHandles.Lookup lookup) {
+		Layout.Of<T> layout = (Layout.Of<T>)layouts.get(Objects.requireNonNull(clazz));
+		if (layout == null) {
+			if (clazz.isArray()) {
+				layout = new DynamicArrayLayout<>(clazz, Layout.of(clazz.getComponentType()));
+			} else {
+				layout = new ClassLayout<>(clazz, lookup);
+			}
+			layouts.put(clazz, layout);
+		}
+		return layout;
 	}
 	
 	static <T> void bind(Class<T> clazz, Layout.Of<T> layout) {
@@ -139,7 +154,7 @@ class ClassLayout<T> implements Layout.Of<T> {
 	}
 	
 	
-	private static void write(Layout layout, Object x, MethodHandle getter, DataOutput out) throws Throwable {
+	private static void write(Layout<?> layout, Object x, MethodHandle getter, DataOutput out) throws Throwable {
 		if (layout == Layout.ofBoolean) {
 			Layout.ofBoolean.write((boolean)getter.invoke(x), out);
 		} else if (layout == Layout.ofByte) {
@@ -162,7 +177,7 @@ class ClassLayout<T> implements Layout.Of<T> {
 		}
 	}
 	
-	private static void read(Layout layout, Object x, MethodHandle setter, DataInput in) throws Throwable {
+	private static void read(Layout<?> layout, Object x, MethodHandle setter, DataInput in) throws Throwable {
 		if (layout == Layout.ofBoolean) {
 			setter.invoke(x, Layout.ofBoolean.read(in));
 		} else if (layout == Layout.ofByte) {
@@ -188,7 +203,7 @@ class ClassLayout<T> implements Layout.Of<T> {
 	
 	
 	@Override
-	public int size() {
+	public Integer size() {
 		return sizeof;
 	}
 	
@@ -201,5 +216,19 @@ class ClassLayout<T> implements Layout.Of<T> {
 				", fieldLayouts=" + Arrays.toString(fieldLayouts) +
 				", sizeof=" + sizeof +
 				'}';
+	}
+	
+	
+	static {
+		Layout.bindToClass(Boolean.class, Layout.ofBoolean.asObjectLayout());
+		Layout.bindToClass(Byte.class, Layout.ofByte.asObjectLayout());
+		Layout.bindToClass(Short.class, Layout.ofShort.asObjectLayout());
+		Layout.bindToClass(Character.class, Layout.ofChar.asObjectLayout());
+		Layout.bindToClass(Integer.class, Layout.ofInt.asObjectLayout());
+		Layout.bindToClass(Float.class, Layout.ofFloat.asObjectLayout());
+		Layout.bindToClass(Long.class, Layout.ofLong.asObjectLayout());
+		Layout.bindToClass(Double.class, Layout.ofDouble.asObjectLayout());
+		
+		Layout.bindToClass(String.class, Layout.ofString);
 	}
 }

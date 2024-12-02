@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
  * @author Sulphuris
  */
 @SuppressWarnings("ClassEscapesDefinedScope") // :)
-public interface Layout {
+public interface Layout<T> {
 	
 	static <T> Of<T> of(Class<T> clazz, MethodHandles.Lookup lookup) {
 		if (clazz.isPrimitive()) // so it's not null
@@ -18,19 +18,17 @@ public interface Layout {
 		return ClassLayout.get(clazz, lookup);
 	}
 	
-	static Layout of(Class<?> clazz) {
+	@SuppressWarnings("unchecked")
+	static <T> Layout<T> of(Class<T> clazz) {
 		if (clazz.isPrimitive()) {
-			if (clazz == byte.class) return ofByte;
-			if (clazz == boolean.class) return ofBoolean;
-			if (clazz == short.class) return ofShort;
-			if (clazz == char.class) return ofChar;
-			if (clazz == int.class) return ofInt;
-			if (clazz == float.class) return ofFloat;
-			if (clazz == long.class) return ofLong;
-			if (clazz == double.class) return ofDouble;
-		}
-		if (clazz.isArray()) {
-			throw new UnpureClassException(clazz, "todo");
+			if (clazz == byte.class)    return (Layout<T>) ofByte;
+			if (clazz == boolean.class) return (Layout<T>) ofBoolean;
+			if (clazz == short.class)   return (Layout<T>) ofShort;
+			if (clazz == char.class)    return (Layout<T>) ofChar;
+			if (clazz == int.class)     return (Layout<T>) ofInt;
+			if (clazz == float.class)   return (Layout<T>) ofFloat;
+			if (clazz == long.class)    return (Layout<T>) ofLong;
+			if (clazz == double.class)  return (Layout<T>) ofDouble;
 		}
 		return of(clazz, MethodHandles.publicLookup());
 	}
@@ -49,13 +47,17 @@ public interface Layout {
 	Layout.OfLong    ofLong    = new OfLong();
 	Layout.OfDouble  ofDouble  = new OfDouble();
 	
+	Layout.Of<String>ofString  = new StringLayout();
 	
 	
-	int size();
+	// nullable (null means unknown or dynamic size)
+	Integer size();
 	
+	Layout.Of<T> asObjectLayout();
 	
-	
-	
+	static boolean isStatic(Layout<?> layout) {
+		return layout.size() != null;
+	}
 	
 	
 	
@@ -70,11 +72,16 @@ public interface Layout {
 	
 	// now every external class which wants to implement Layout has to implements this
 	// (I also could've just make it as an abstract class, but it's boring)
-	interface Of<T> extends Layout {
+	interface Of<T> extends Layout<T> {
 		
 		void write(T x, DataOutput out) throws IOException;
 		
 		T read(DataInput in) throws IOException;
+		
+		@Override
+		default Of<T> asObjectLayout() {
+			return this;
+		}
 		
 		@Override
 		default Local __local() {
@@ -82,13 +89,36 @@ public interface Layout {
 		}
 	}
 	
-	final class OfByte implements Layout {
+	final class OfByte implements Layout<Byte> {
 		OfByte() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 1;
+		}
+		
+		// it's a singleton anyway so doesn't matter
+		private final Of<Byte> object = new Of<Byte>() {
+			@Override
+			public void write(Byte x, DataOutput out) throws IOException {
+				OfByte.this.write(x, out);
+			}
+			
+			@Override
+			public Byte read(DataInput in) throws IOException {
+				return OfByte.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 1;
+			}
+		};
+		
+		@Override
+		public Of<Byte> asObjectLayout() {
+			return object;
 		}
 		
 		@Override
@@ -105,14 +135,37 @@ public interface Layout {
 		}
 	}
 	
-	final class OfBoolean implements Layout {
+	final class OfBoolean implements Layout<Boolean> {
 		OfBoolean() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 1;
 		}
+		
+		private final Of<Boolean> object = new Of<Boolean>() {
+			@Override
+			public void write(Boolean x, DataOutput out) throws IOException {
+				OfBoolean.this.write(x, out);
+			}
+			
+			@Override
+			public Boolean read(DataInput in) throws IOException {
+				return OfBoolean.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 1;
+			}
+		};
+		
+		@Override
+		public Of<Boolean> asObjectLayout() {
+			return object;
+		}
+		
 		
 		@Override
 		public Local __local() {
@@ -128,13 +181,35 @@ public interface Layout {
 		}
 	}
 	
-	final class OfShort implements Layout {
+	final class OfShort implements Layout<Short> {
 		OfShort() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 2;
+		}
+		
+		private final Of<Short> object = new Of<Short>() {
+			@Override
+			public void write(Short x, DataOutput out) throws IOException {
+				OfShort.this.write(x, out);
+			}
+			
+			@Override
+			public Short read(DataInput in) throws IOException {
+				return OfShort.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 2;
+			}
+		};
+		
+		@Override
+		public Of<Short> asObjectLayout() {
+			return object;
 		}
 		
 		@Override
@@ -151,13 +226,35 @@ public interface Layout {
 		}
 	}
 	
-	final class OfChar implements Layout {
+	final class OfChar implements Layout<Character> {
 		OfChar() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 2;
+		}
+		
+		private final Of<Character> object = new Of<Character>() {
+			@Override
+			public void write(Character x, DataOutput out) throws IOException {
+				OfChar.this.write(x, out);
+			}
+			
+			@Override
+			public Character read(DataInput in) throws IOException {
+				return OfChar.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 2;
+			}
+		};
+		
+		@Override
+		public Of<Character> asObjectLayout() {
+			return object;
 		}
 		
 		@Override
@@ -174,13 +271,35 @@ public interface Layout {
 		}
 	}
 	
-	final class OfInt implements Layout {
+	final class OfInt implements Layout<Integer> {
 		OfInt() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 4;
+		}
+		
+		private final Of<Integer> object = new Of<Integer>() {
+			@Override
+			public void write(Integer x, DataOutput out) throws IOException {
+				OfInt.this.write(x, out);
+			}
+			
+			@Override
+			public Integer read(DataInput in) throws IOException {
+				return OfInt.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 4;
+			}
+		};
+		
+		@Override
+		public Of<Integer> asObjectLayout() {
+			return object;
 		}
 		
 		@Override
@@ -197,13 +316,36 @@ public interface Layout {
 		}
 	}
 	
-	final class OfFloat implements Layout {
+	final class OfFloat implements Layout<Float> {
 		OfFloat() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 4;
+		}
+		
+		private final Of<Float> object = new Of<Float>() {
+			@Override
+			public void write(Float x, DataOutput out) throws IOException {
+				OfFloat.this.write(x, out);
+			}
+			
+			@Override
+			public Float read(DataInput in) throws IOException {
+				return OfFloat.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 4;
+			}
+		};
+		
+		
+		@Override
+		public Of<Float> asObjectLayout() {
+			return object;
 		}
 		
 		@Override
@@ -220,13 +362,36 @@ public interface Layout {
 		}
 	}
 	
-	final class OfLong implements Layout {
+	final class OfLong implements Layout<Long> {
 		OfLong() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 8;
+		}
+		
+		private final Of<Long> object = new Of<Long>() {
+			@Override
+			public void write(Long x, DataOutput out) throws IOException {
+				OfLong.this.write(x, out);
+			}
+			
+			@Override
+			public Long read(DataInput in) throws IOException {
+				return OfLong.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 8;
+			}
+		};
+		
+		
+		@Override
+		public Of<Long> asObjectLayout() {
+			return object;
 		}
 		
 		@Override
@@ -243,13 +408,35 @@ public interface Layout {
 		}
 	}
 	
-	final class OfDouble implements Layout {
+	final class OfDouble implements Layout<Double> {
 		OfDouble() {
 		}
 		
 		@Override
-		public int size() {
+		public Integer size() {
 			return 8;
+		}
+		
+		private final Of<Double> object = new Of<Double>() {
+			@Override
+			public void write(Double x, DataOutput out) throws IOException {
+				OfDouble.this.write(x, out);
+			}
+			
+			@Override
+			public Double read(DataInput in) throws IOException {
+				return OfDouble.this.read(in);
+			}
+			
+			@Override
+			public Integer size() {
+				return 8;
+			}
+		};
+		
+		@Override
+		public Of<Double> asObjectLayout() {
+			return object;
 		}
 		
 		@Override

@@ -14,7 +14,7 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException {
 		DataOutputStream output = new DataOutputStream(data);
-		PacketExample packet = new PacketExample(4, 6, 55);
+		PacketExample packet = new PacketExample(4, 6, 55, 66, 77);
 		
 		packet.send(output);
 		
@@ -35,12 +35,12 @@ public class Main {
 class PacketExample {
 	public final int code;
 	public final int other_code;
-	public final long long_code_idk;
+	public final long[] very_long_code_idk;
 	
-	public PacketExample(int code, int other_code, long long_code_idk) {
+	public PacketExample(int code, int other_code, long... long_code_idk) {
 		this.code = code;
 		this.other_code = other_code;
-		this.long_code_idk = long_code_idk;
+		this.very_long_code_idk = long_code_idk;
 	}
 	
 	// I want unsafe.allocateInstance by reflection =<
@@ -59,7 +59,7 @@ class PacketExample {
 		return "PacketExample{" +
 				"code=" + code +
 				", other_code=" + other_code +
-				", long_code_idk=" + long_code_idk +
+				", long_code_idk=" + Arrays.toString(very_long_code_idk) +
 				'}';
 	}
 }
