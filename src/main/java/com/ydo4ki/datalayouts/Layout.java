@@ -50,7 +50,7 @@ public interface Layout<T> {
 	Layout.OfLong    ofLong    = new OfLong();
 	Layout.OfDouble  ofDouble  = new OfDouble();
 	
-	Layout.Of<String>ofString  = new WStringLayout();
+	Layout.Of<String>ofString  = new StringLayout(StringEncoding.get(StringEncoding.UTF16), false);
 	
 	
 	// nullable (null means unknown or dynamic size)
@@ -93,7 +93,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfByte implements Layout<Byte> {
+	class OfByte implements Layout<Byte> {
 		OfByte() {
 		}
 		
@@ -139,7 +139,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfBoolean implements Layout<Boolean> {
+	class OfBoolean implements Layout<Boolean> {
 		OfBoolean() {
 		}
 		
@@ -185,7 +185,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfShort implements Layout<Short> {
+	class OfShort implements Layout<Short> {
 		OfShort() {
 		}
 		
@@ -230,7 +230,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfChar implements Layout<Character> {
+	class OfChar implements Layout<Character> {
 		OfChar() {
 		}
 		
@@ -275,7 +275,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfInt implements Layout<Integer> {
+	class OfInt implements Layout<Integer> {
 		OfInt() {
 		}
 		
@@ -320,7 +320,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfFloat implements Layout<Float> {
+	class OfFloat implements Layout<Float> {
 		OfFloat() {
 		}
 		
@@ -366,7 +366,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfLong implements Layout<Long> {
+	class OfLong implements Layout<Long> {
 		OfLong() {
 		}
 		
@@ -412,7 +412,7 @@ public interface Layout<T> {
 		}
 	}
 	
-	final class OfDouble implements Layout<Double> {
+	class OfDouble implements Layout<Double> {
 		OfDouble() {
 		}
 		

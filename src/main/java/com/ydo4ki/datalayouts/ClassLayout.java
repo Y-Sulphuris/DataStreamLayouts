@@ -1,5 +1,7 @@
 package com.ydo4ki.datalayouts;
 
+import com.ydo4ki.datalayouts.annotations.Encoding;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -197,22 +199,5 @@ class ClassLayout<T> implements Layout.Of<T> {
 	}
 	
 	
-	static {
-		Layout.bindTo(Boolean.class, Layout.ofBoolean.asObjectLayout());
-		Layout.bindTo(Byte.class, Layout.ofByte.asObjectLayout());
-		Layout.bindTo(Short.class, Layout.ofShort.asObjectLayout());
-		Layout.bindTo(Character.class, Layout.ofChar.asObjectLayout());
-		Layout.bindTo(Integer.class, Layout.ofInt.asObjectLayout());
-		Layout.bindTo(Float.class, Layout.ofFloat.asObjectLayout());
-		Layout.bindTo(Long.class, Layout.ofLong.asObjectLayout());
-		Layout.bindTo(Double.class, Layout.ofDouble.asObjectLayout());
-		
-		Layout.bindTo(String.class, Layout.ofString);
-	}
-	
-	static {
-		// i hate java generics
-		Layout.<UTF8, String, Layout<String>>bindAnnotationPragma(UTF8.class, (l, utf, cls) -> new StringLayout());
-	}
 	
 }

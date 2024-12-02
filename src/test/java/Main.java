@@ -1,5 +1,7 @@
 import com.ydo4ki.datalayouts.Layout;
-import com.ydo4ki.datalayouts.UTF8;
+import com.ydo4ki.datalayouts.StringEncoding;
+import com.ydo4ki.datalayouts.annotations.Encoding;
+import com.ydo4ki.datalayouts.annotations.NullTerminated;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
@@ -37,7 +39,8 @@ class PacketExample {
 	// so i came up with system that allows anyone to create serialization rules via field annotations
 	// FINALLY
 	// so now we can create any custom annotation and use it to specify serialization rules
-	@UTF8
+	@Encoding(StringEncoding.UTF16)
+	@NullTerminated // yeeey it works too
 	public final String name;
 	
 	

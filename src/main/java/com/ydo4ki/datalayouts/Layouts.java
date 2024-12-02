@@ -1,5 +1,8 @@
 package com.ydo4ki.datalayouts;
 
+import com.ydo4ki.datalayouts.annotations.Encoding;
+import com.ydo4ki.datalayouts.annotations.NullTerminated;
+
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
@@ -106,5 +109,40 @@ class Layouts {
 		if (clazz == long.class)    return Layout.ofLong;
 		if (clazz == double.class)  return Layout.ofDouble;
 		throw new AssertionError();
+	}
+	
+	
+	
+	
+	static {
+		Layout.bindTo(Boolean.class, Layout.ofBoolean.asObjectLayout());
+		Layout.bindTo(Byte.class, Layout.ofByte.asObjectLayout());
+		Layout.bindTo(Short.class, Layout.ofShort.asObjectLayout());
+		Layout.bindTo(Character.class, Layout.ofChar.asObjectLayout());
+		Layout.bindTo(Integer.class, Layout.ofInt.asObjectLayout());
+		Layout.bindTo(Float.class, Layout.ofFloat.asObjectLayout());
+		Layout.bindTo(Long.class, Layout.ofLong.asObjectLayout());
+		Layout.bindTo(Double.class, Layout.ofDouble.asObjectLayout());
+		
+		Layout.bindTo(String.class, Layout.ofString);
+	}
+	
+	static {
+		// well now it starts working
+		Layout.bindAnnotationPragma(Encoding.class, Layouts::getEncodingLayout);
+		Layout.bindAnnotationPragma(NullTerminated.class, Layouts::getNullTerminatedLayout);
+	}
+	
+	private static StringLayout getEncodingLayout(StringLayout l, Encoding encoding, Class<String> cls) {
+		//noinspection DataFlowIssue
+		if (!(l instanceof StringLayout) || cls != String.class)
+			throw new IllegalArgumentException("Invalid class or invalid string layout or invalid idk what, encoding is unsupported here anyways");
+		return l.updateEncoding(StringEncoding.get(encoding.value()));
+	}
+	private static StringLayout getNullTerminatedLayout(StringLayout l, NullTerminated nullTerminated, Class<String> cls) {
+		//noinspection DataFlowIssue
+		if (!(l instanceof StringLayout) || cls != String.class)
+			throw new IllegalArgumentException("Invalid class or invalid string layout or invalid idk what, null-terminated is unsupported here anyways");
+		return l.updateNullTerminated(nullTerminated.value());
 	}
 }
