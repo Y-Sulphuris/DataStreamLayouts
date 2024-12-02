@@ -7,8 +7,8 @@ import java.lang.reflect.Array;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 class DynamicArrayLayout<T> implements ArrayLayout<T> {
-	private final Class<T> arrayType;
-	private final Layout elementLayout;
+	protected final Class<T> arrayType;
+	protected final Layout elementLayout;
 	
 	DynamicArrayLayout(Class<T> arrayType, Layout elementLayout) {
 		if (!arrayType.isArray()) throw new UnpureClassException(arrayType, "array expected");
@@ -18,6 +18,7 @@ class DynamicArrayLayout<T> implements ArrayLayout<T> {
 	
 	@Override
 	public void write(T array, DataOutput out) throws IOException {
+		out.writeInt(Array.getLength(array));
 		for (int i = 0, Len = Array.getLength(array); i < Len; i++) {
 			elementLayout.asObjectLayout().write(Array.get(array, i), out);
 		}
