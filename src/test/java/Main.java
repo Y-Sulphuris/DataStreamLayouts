@@ -5,6 +5,7 @@ import com.ydo4ki.datalayouts.annotations.*;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * @since 12/1/2024 10:37 PM
@@ -16,7 +17,10 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException {
 		DataOutputStream output = new DataOutputStream(data);
-		PacketExample packet = new PacketExample("oaoa", 4, 6, 55, 66, 77);
+		
+		UUID uuid = UUID.randomUUID();
+		System.out.println(uuid);
+		PacketExample packet = new PacketExample("oaoa", uuid,4, 6, 55, 66, 77);
 		
 		packet.send(output);
 		
@@ -46,13 +50,14 @@ class PacketExample {
 	// that's it i'm happy
 	public final String name;
 	
-	
+	public final UUID uuid;
 	public final int code;
 	public final int other_code;
 	public final long[] very_long_code_idk;
 	
-	public PacketExample(String name, int code, int other_code, long... long_code_idk) {
+	public PacketExample(String name, UUID uuid, int code, int other_code, long... long_code_idk) {
 		this.name = name;
+		this.uuid = uuid;
 		this.code = code;
 		this.other_code = other_code;
 		this.very_long_code_idk = long_code_idk;
@@ -60,7 +65,7 @@ class PacketExample {
 	
 	// I want unsafe.allocateInstance by reflection =<
 	public PacketExample() {
-		this("", 0,0,0);
+		this("", UUID.randomUUID(), 0,0,0);
 	}
 	
 	static final Layout.Of<PacketExample> layout = Layout.of(PacketExample.class, MethodHandles.lookup());
@@ -73,6 +78,7 @@ class PacketExample {
 	public String toString() {
 		return "PacketExample{" +
 				"name='" + name + '\'' +
+				", uuid=" + uuid +
 				", code=" + code +
 				", other_code=" + other_code +
 				", very_long_code_idk=" + Arrays.toString(very_long_code_idk) +

@@ -11,6 +11,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @since 12/2/2024 6:05 PM
@@ -116,6 +117,26 @@ class Layouts {
 	
 	
 	
+	private static final class UUIDLayout implements Layout.Of<UUID> {
+		
+		@Override
+		public void write(UUID x, DataOutput out) throws IOException {
+			out.writeLong(x.getMostSignificantBits());
+			out.writeLong(x.getLeastSignificantBits());
+		}
+		
+		@Override
+		public UUID read(DataInput in) throws IOException {
+			return new UUID(in.readLong(), in.readLong());
+		}
+		
+		@Override
+		public Integer size() {
+			return 16;
+		}
+	}
+	
+	
 	
 	static {
 		Layout.bindTo(Boolean.class, Layout.ofBoolean.asObjectLayout());
@@ -128,6 +149,7 @@ class Layouts {
 		Layout.bindTo(Double.class, Layout.ofDouble.asObjectLayout());
 		
 		Layout.bindTo(String.class, Layout.ofString);
+		Layout.bindTo(UUID.class, new UUIDLayout());
 	}
 	
 	static {
