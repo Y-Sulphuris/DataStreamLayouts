@@ -1,6 +1,6 @@
 package com.ydo4ki.datalayouts;
 
-import com.ydo4ki.datalayouts.annotations.*;
+import com.ydo4ki.datalayouts.annotation.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;

@@ -52,6 +52,10 @@ public interface Layout<T> {
 	
 	Layout.Of<String>ofString  = new StringLayout.DynamicStringLayout(StringEncoding.get(StringEncoding.UTF16), false);
 	
+	static Layout.Of<Void>  skip(int bytes) {
+		return new SkipLayout(bytes);
+	}
+	
 	
 	// nullable (null means unknown or dynamic size)
 	Integer size();

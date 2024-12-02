@@ -1,7 +1,5 @@
 package com.ydo4ki.datalayouts;
 
-import com.ydo4ki.datalayouts.annotations.Encoding;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;

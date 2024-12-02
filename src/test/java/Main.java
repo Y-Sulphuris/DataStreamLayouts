@@ -1,6 +1,6 @@
 import com.ydo4ki.datalayouts.Layout;
 import com.ydo4ki.datalayouts.StringEncoding;
-import com.ydo4ki.datalayouts.annotations.*;
+import com.ydo4ki.datalayouts.annotation.*;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;

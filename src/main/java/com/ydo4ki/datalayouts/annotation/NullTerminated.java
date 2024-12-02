@@ -1,4 +1,4 @@
-package com.ydo4ki.datalayouts.annotations;
+package com.ydo4ki.datalayouts.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package com.ydo4ki.datalayouts.annotations;
+package com.ydo4ki.datalayouts.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,11 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @since 12/2/2024 7:49 PM
+ * @since 12/3/2024 12:53 AM
  * @author Sulphuris
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Length {
-	int value();
+public @interface UnsignedShort {
 }
