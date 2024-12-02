@@ -2,6 +2,7 @@ import com.ydo4ki.datalayouts.Layout;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -13,6 +14,8 @@ public class Main {
 	private static final ByteArrayOutputStream data = new ByteArrayOutputStream(64);
 	
 	public static void main(String[] args) throws IOException {
+		System.out.println(Arrays.toString(PacketExample.class.getInterfaces()));
+		if (true) return;
 		DataOutputStream output = new DataOutputStream(data);
 		PacketExample packet = new PacketExample(4, 6, 55, 66, 77);
 		
@@ -32,7 +35,7 @@ public class Main {
 
 
 @SuppressWarnings("FieldCanBeLocal")
-class PacketExample {
+class PacketExample extends ArrayList {
 	public final int code;
 	public final int other_code;
 	public final long[] very_long_code_idk;

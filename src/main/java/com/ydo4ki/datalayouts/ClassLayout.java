@@ -17,7 +17,7 @@ import java.util.*;
  */
 class ClassLayout<T> implements Layout.Of<T> {
 	private final Class<T> clazz;
-	private final MethodHandle contructor;
+	private final MethodHandle constructor;
 	private final MethodHandle[] getters;
 	private final MethodHandle[] setters;
 	private final Layout<?>[] fieldLayouts;
@@ -33,7 +33,7 @@ class ClassLayout<T> implements Layout.Of<T> {
 		try {
 			this.getters = find(fields, lookup, MethodHandles.Lookup::unreflectGetter);
 			this.setters = find(fields, lookup, MethodHandles.Lookup::unreflectSetter);
-			this.contructor = lookup.findConstructor(clazz, MethodType.methodType(void.class)); // wow i didn't expect that already
+			this.constructor = lookup.findConstructor(clazz, MethodType.methodType(void.class)); // wow i didn't expect that already
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -100,17 +100,41 @@ class ClassLayout<T> implements Layout.Of<T> {
 	
 	
 	private static final Map<Class<?>, Layout.Of<?>> layouts = new HashMap<>();
+	private static final Map<Class<?>, Layout.Of<?>> virtualLayouts = new HashMap<>();
 	
 	@SuppressWarnings("unchecked")
-	static <T> Layout.Of<T> get(Class<T> clazz, MethodHandles.Lookup lookup) {
+	private static <T> Layout.Of<T> getLayoutIfExists(Class<T> clazz) {
 		Layout.Of<T> layout = (Layout.Of<T>)layouts.get(Objects.requireNonNull(clazz));
+		if (layout != null) return layout;
+		
+		return (Of<T>) findLayoutForVirtual(clazz);
+	}
+	
+	private static Layout.Of<?> findLayoutForVirtual(Class<?> clazz) {
+		Layout.Of<?> layout = virtualLayouts.get(clazz);
+		if (layout != null) return layout;
+		
+		layout = findLayoutForVirtual(clazz);
+		if (layout != null) return layout;
+		
+		for (Class<?> anInterface : clazz.getInterfaces()) {
+			layout = findLayoutForVirtual(anInterface);
+			if (layout != null) return layout;
+		}
+		return layout;
+	}
+	
+	
+	
+	static <T> Layout.Of<T> get(Class<T> clazz, MethodHandles.Lookup lookup) {
+		Layout.Of<T> layout = getLayoutIfExists(clazz);
 		if (layout == null) {
 			if (clazz.isArray()) {
 				layout = new DynamicArrayLayout<>(clazz, Layout.of(clazz.getComponentType()));
 			} else {
 				layout = new ClassLayout<>(clazz, lookup);
 			}
-			layouts.put(clazz, layout);
+			bind(clazz, layout);
 		}
 		return layout;
 	}
@@ -118,7 +142,14 @@ class ClassLayout<T> implements Layout.Of<T> {
 	static <T> void bind(Class<T> clazz, Layout.Of<T> layout) {
 		if (layouts.containsKey(clazz))
 			throw new IllegalArgumentException(clazz + " already has a layout");
+		if (clazz.isInterface() || (clazz.getModifiers() & Modifier.ABSTRACT) != 0)
+			throw new UnpureClassException(clazz, "not finished classes are not allowed");
 		layouts.put(clazz, layout);
+	}
+	static <T> void bindVirtual(Class<T> clazz, Layout.Of<T> layout) {
+		if (virtualLayouts.containsKey(clazz))
+			throw new IllegalArgumentException(clazz + " already has a layout");
+		virtualLayouts.put(clazz, layout);
 	}
 	
 	
@@ -139,7 +170,7 @@ class ClassLayout<T> implements Layout.Of<T> {
 	@Override
 	public T read(DataInput in) throws IOException {
 		try {
-			T newInstance = (T)contructor.invoke();
+			T newInstance = (T) constructor.invoke();
 			
 			for (int i = 0, Len = fieldsCount(); i < Len; i++) {
 				read(fieldLayouts[i], newInstance, setters[i], in);
@@ -220,15 +251,15 @@ class ClassLayout<T> implements Layout.Of<T> {
 	
 	
 	static {
-		Layout.bindToClass(Boolean.class, Layout.ofBoolean.asObjectLayout());
-		Layout.bindToClass(Byte.class, Layout.ofByte.asObjectLayout());
-		Layout.bindToClass(Short.class, Layout.ofShort.asObjectLayout());
-		Layout.bindToClass(Character.class, Layout.ofChar.asObjectLayout());
-		Layout.bindToClass(Integer.class, Layout.ofInt.asObjectLayout());
-		Layout.bindToClass(Float.class, Layout.ofFloat.asObjectLayout());
-		Layout.bindToClass(Long.class, Layout.ofLong.asObjectLayout());
-		Layout.bindToClass(Double.class, Layout.ofDouble.asObjectLayout());
+		Layout.bindTo(Boolean.class, Layout.ofBoolean.asObjectLayout());
+		Layout.bindTo(Byte.class, Layout.ofByte.asObjectLayout());
+		Layout.bindTo(Short.class, Layout.ofShort.asObjectLayout());
+		Layout.bindTo(Character.class, Layout.ofChar.asObjectLayout());
+		Layout.bindTo(Integer.class, Layout.ofInt.asObjectLayout());
+		Layout.bindTo(Float.class, Layout.ofFloat.asObjectLayout());
+		Layout.bindTo(Long.class, Layout.ofLong.asObjectLayout());
+		Layout.bindTo(Double.class, Layout.ofDouble.asObjectLayout());
 		
-		Layout.bindToClass(String.class, Layout.ofString);
+		Layout.bindTo(String.class, Layout.ofString);
 	}
 }

@@ -34,8 +34,12 @@ public interface Layout<T> {
 	}
 	
 	
-	static <T> void bindToClass(Class<T> clazz, Layout.Of<T> layout) {
+	static <T> void bindTo(Class<T> clazz, Layout.Of<T> layout) {
 		ClassLayout.bind(clazz, layout);
+	}
+	
+	static <T> void bindToVirtual(Class<T> clazz, Layout.Of<T> layout) {
+		ClassLayout.bindVirtual(clazz, layout); // jk
 	}
 	
 	Layout.OfByte    ofByte    = new OfByte();
