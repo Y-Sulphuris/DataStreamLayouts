@@ -3,6 +3,7 @@ package com.ydo4ki.datalayouts;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -12,34 +13,32 @@ import java.lang.invoke.MethodHandles;
 @SuppressWarnings("ClassEscapesDefinedScope") // :)
 public interface Layout<T> {
 	
-	static <T> Of<T> of(Class<T> clazz, MethodHandles.Lookup lookup) {
+	static <T> Of<T> of(Class<T> clazz, MethodHandles.Lookup lookup, Annotation... annotations) {
 		if (clazz.isPrimitive()) // so it's not null
-			throw new UnpureClassException(clazz, "Use ::of<PrimitiveName> instead");
-		return ClassLayout.get(clazz, lookup);
+			throw new UnpureClassException(clazz, "Use ::of(Class) instead");
+		return Layouts.applyAnnotations(Layouts.get(clazz, lookup), annotations, clazz).asObjectLayout(); // wow
 	}
 	
 	@SuppressWarnings("unchecked")
-	static <T> Layout<T> of(Class<T> clazz) {
+	static <T> Layout<T> of(Class<T> clazz, Annotation... annotations) {
 		if (clazz.isPrimitive()) {
-			if (clazz == byte.class)    return (Layout<T>) ofByte;
-			if (clazz == boolean.class) return (Layout<T>) ofBoolean;
-			if (clazz == short.class)   return (Layout<T>) ofShort;
-			if (clazz == char.class)    return (Layout<T>) ofChar;
-			if (clazz == int.class)     return (Layout<T>) ofInt;
-			if (clazz == float.class)   return (Layout<T>) ofFloat;
-			if (clazz == long.class)    return (Layout<T>) ofLong;
-			if (clazz == double.class)  return (Layout<T>) ofDouble;
+			return Layouts.applyAnnotations((Layout<T>)Layouts.primitiveLayout(clazz), annotations, clazz);
 		}
-		return of(clazz, MethodHandles.publicLookup());
+		return of(clazz, MethodHandles.publicLookup(), annotations);
 	}
+	
 	
 	
 	static <T> void bindTo(Class<T> clazz, Layout.Of<T> layout) {
-		ClassLayout.bind(clazz, layout);
+		Layouts.bind(clazz, layout);
 	}
 	
 	static <T> void bindToVirtual(Class<T> clazz, Layout.Of<T> layout) {
-		ClassLayout.bindVirtual(clazz, layout); // jk
+		Layouts.bindVirtual(clazz, layout); // jk
+	}
+	
+	static <A extends Annotation, T, L extends Layout<T>> void bindAnnotationPragma(Class<A> annotationType, AnnotationPragma<A, T, L> pragma) {
+		Layouts.registerAnnotation(annotationType, pragma);
 	}
 	
 	Layout.OfByte    ofByte    = new OfByte();
@@ -51,13 +50,14 @@ public interface Layout<T> {
 	Layout.OfLong    ofLong    = new OfLong();
 	Layout.OfDouble  ofDouble  = new OfDouble();
 	
-	Layout.Of<String>ofString  = new StringLayout();
+	Layout.Of<String>ofString  = new WStringLayout();
 	
 	
 	// nullable (null means unknown or dynamic size)
 	Integer size();
 	
 	Layout.Of<T> asObjectLayout();
+	
 	
 	static boolean isStatic(Layout<?> layout) {
 		return layout.size() != null;

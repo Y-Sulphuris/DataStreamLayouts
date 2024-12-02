@@ -59,7 +59,7 @@ class ClassLayout<T> implements Layout.Of<T> {
 		Layout<?>[] layouts = new Layout[fields.size()];
 		for (int i = 0; i < fields.size(); i++) {
 			Class<?> type = fields.get(i).getType();
-			layouts[i] = Layout.of(Objects.requireNonNull(type));
+			layouts[i] = Layout.of(Objects.requireNonNull(type), fields.get(i).getAnnotations());
 		}
 		return layouts;
 	}
@@ -98,59 +98,6 @@ class ClassLayout<T> implements Layout.Of<T> {
 	
 	
 	
-	
-	private static final Map<Class<?>, Layout.Of<?>> layouts = new HashMap<>();
-	private static final Map<Class<?>, Layout.Of<?>> virtualLayouts = new HashMap<>();
-	
-	@SuppressWarnings("unchecked")
-	private static <T> Layout.Of<T> getLayoutIfExists(Class<T> clazz) {
-		Layout.Of<T> layout = (Layout.Of<T>)layouts.get(Objects.requireNonNull(clazz));
-		if (layout != null) return layout;
-		
-		return (Of<T>) findLayoutForVirtual(clazz);
-	}
-	
-	private static Layout.Of<?> findLayoutForVirtual(Class<?> clazz) {
-		Layout.Of<?> layout = virtualLayouts.get(clazz);
-		if (layout != null) return layout;
-		
-		layout = findLayoutForVirtual(clazz);
-		if (layout != null) return layout;
-		
-		for (Class<?> anInterface : clazz.getInterfaces()) {
-			layout = findLayoutForVirtual(anInterface);
-			if (layout != null) return layout;
-		}
-		return layout;
-	}
-	
-	
-	
-	static <T> Layout.Of<T> get(Class<T> clazz, MethodHandles.Lookup lookup) {
-		Layout.Of<T> layout = getLayoutIfExists(clazz);
-		if (layout == null) {
-			if (clazz.isArray()) {
-				layout = new DynamicArrayLayout<>(clazz, Layout.of(clazz.getComponentType()));
-			} else {
-				layout = new ClassLayout<>(clazz, lookup);
-			}
-			bind(clazz, layout);
-		}
-		return layout;
-	}
-	
-	static <T> void bind(Class<T> clazz, Layout.Of<T> layout) {
-		if (layouts.containsKey(clazz))
-			throw new IllegalArgumentException(clazz + " already has a layout");
-		if (clazz.isInterface() || (clazz.getModifiers() & Modifier.ABSTRACT) != 0)
-			throw new UnpureClassException(clazz, "not finished classes are not allowed");
-		layouts.put(clazz, layout);
-	}
-	static <T> void bindVirtual(Class<T> clazz, Layout.Of<T> layout) {
-		if (virtualLayouts.containsKey(clazz))
-			throw new IllegalArgumentException(clazz + " already has a layout");
-		virtualLayouts.put(clazz, layout);
-	}
 	
 	
 	@Override
@@ -262,4 +209,10 @@ class ClassLayout<T> implements Layout.Of<T> {
 		
 		Layout.bindTo(String.class, Layout.ofString);
 	}
+	
+	static {
+		// i hate java generics
+		Layout.<UTF8, String, Layout<String>>bindAnnotationPragma(UTF8.class, (l, utf, cls) -> new StringLayout());
+	}
+	
 }

@@ -1,8 +1,8 @@
 import com.ydo4ki.datalayouts.Layout;
+import com.ydo4ki.datalayouts.UTF8;
 
 import java.io.*;
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -14,10 +14,8 @@ public class Main {
 	private static final ByteArrayOutputStream data = new ByteArrayOutputStream(64);
 	
 	public static void main(String[] args) throws IOException {
-		System.out.println(Arrays.toString(PacketExample.class.getInterfaces()));
-		if (true) return;
 		DataOutputStream output = new DataOutputStream(data);
-		PacketExample packet = new PacketExample(4, 6, 55, 66, 77);
+		PacketExample packet = new PacketExample("oaoa", 4, 6, 55, 66, 77);
 		
 		packet.send(output);
 		
@@ -35,12 +33,21 @@ public class Main {
 
 
 @SuppressWarnings("FieldCanBeLocal")
-class PacketExample extends ArrayList {
+class PacketExample {
+	// so i came up with system that allows anyone to create serialization rules via field annotations
+	// FINALLY
+	// so now we can create any custom annotation and use it to specify serialization rules
+	@UTF8
+	public final String name;
+	
+	
+	
 	public final int code;
 	public final int other_code;
 	public final long[] very_long_code_idk;
 	
-	public PacketExample(int code, int other_code, long... long_code_idk) {
+	public PacketExample(String name, int code, int other_code, long... long_code_idk) {
+		this.name = name;
 		this.code = code;
 		this.other_code = other_code;
 		this.very_long_code_idk = long_code_idk;
@@ -48,7 +55,7 @@ class PacketExample extends ArrayList {
 	
 	// I want unsafe.allocateInstance by reflection =<
 	public PacketExample() {
-		this(0,0,0);
+		this("", 0,0,0);
 	}
 	
 	static final Layout.Of<PacketExample> layout = Layout.of(PacketExample.class, MethodHandles.lookup());
@@ -60,9 +67,10 @@ class PacketExample extends ArrayList {
 	@Override
 	public String toString() {
 		return "PacketExample{" +
-				"code=" + code +
+				"name='" + name + '\'' +
+				", code=" + code +
 				", other_code=" + other_code +
-				", long_code_idk=" + Arrays.toString(very_long_code_idk) +
+				", very_long_code_idk=" + Arrays.toString(very_long_code_idk) +
 				'}';
 	}
 }
