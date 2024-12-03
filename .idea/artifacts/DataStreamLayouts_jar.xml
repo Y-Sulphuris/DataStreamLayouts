@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DataStreamLayouts:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DataStreamLayouts_jar</output-path>
+    <root id="archive" name="DataStreamLayouts.jar">
+      <element id="module-output" name="DataStreamLayouts" />
+    </root>
+  </artifact>
+</component>

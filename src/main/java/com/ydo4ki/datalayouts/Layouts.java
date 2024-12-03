@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @since 12/2/2024 6:05 PM
@@ -25,15 +22,20 @@ class Layouts {
 	
 	private static final Map<Class<?>, Layout.Of<?>> layouts = new HashMap<>();
 	private static final Map<Class<?>, Layout.Of<?>> virtualLayouts = new HashMap<>();
-	private static final Map<Class<? extends Annotation>, AnnotationPragma<?,?,?>> annotations = new HashMap<>();
+	private static final Map<AnnotatedFieldType, AnnotationPragma<?,?,?>> annotations = new HashMap<>();
+	private static final Set<Class<? extends Annotation>> registeredAnnotations = new HashSet<>();
 	
 	static <T> Layout<T> applyAnnotations(Layout<T> layout, Annotation[] annotations, Class<T> clazz) {
 		for (Annotation annotation : annotations) {
 			@SuppressWarnings("unchecked")
-			AnnotationPragma<Annotation,T,Layout<T>> pragma = (AnnotationPragma<Annotation,T,Layout<T>>) getPragma(annotation.annotationType());
+			AnnotationPragma<Annotation,T,Layout<T>> pragma = (AnnotationPragma<Annotation,T,Layout<T>>) getPragma(annotation.annotationType(), clazz);
 			
-			if (pragma == null)
+			if (pragma == null) {
+				if (registeredAnnotations.contains(annotation.annotationType())) {
+					throw new IllegalArgumentException("Invalid annotation " + annotation + " for " + clazz.getCanonicalName() + " field");
+				}
 				continue;
+			}
 			layout = pragma.getLayout(layout, annotation, clazz);
 		}
 		return layout;
@@ -92,15 +94,46 @@ class Layouts {
 	}
 	
 	// func type = Layout<T>(Class<?> targetType, T annotationItself)
-	static <A extends Annotation> void registerAnnotation(Class<A> annotationType, AnnotationPragma<A,?,?> pragma) {
-		if (annotations.containsKey(annotationType)) throw new IllegalArgumentException("This annotation is already registered");
-		annotations.put(annotationType, pragma);
+	static <A extends Annotation> void registerAnnotation(Class<A> annotationType, Class<?> fieldType, AnnotationPragma<A,?,?> pragma) {
+		AnnotatedFieldType type = new AnnotatedFieldType(annotationType, fieldType);
+		
+		if (annotations.containsKey(type))
+			throw new IllegalArgumentException("This annotation is already registered");
+		annotations.put(type, pragma);
+		registeredAnnotations.add(annotationType);
 	}
 	
 	@SuppressWarnings("unchecked")
-	static <A extends Annotation> AnnotationPragma<A,?,?> getPragma(Class<A> annotationType) {
-		return (AnnotationPragma<A,?,?>) annotations.get(annotationType);
+	static <A extends Annotation> AnnotationPragma<A,?,?> getPragma(Class<A> annotationType, Class<?> fieldType) {
+		return (AnnotationPragma<A,?,?>) annotations.get(new AnnotatedFieldType(annotationType, fieldType));
 	}
+	
+	private static final class AnnotatedFieldType {
+		final Class<? extends Annotation> annotationType;
+		final Class<?> fieldType;
+		final int hash;
+		
+		private AnnotatedFieldType(Class<? extends Annotation> annotationType, Class<?> fieldType) {
+			this.annotationType = annotationType;
+			this.fieldType = fieldType;
+			this.hash = Objects.hash(annotationType, fieldType);
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (o == null || getClass() != o.getClass()) return false;
+			AnnotatedFieldType that = (AnnotatedFieldType) o;
+			return Objects.equals(annotationType, that.annotationType) && Objects.equals(fieldType, that.fieldType);
+		}
+		
+		@Override
+		public int hashCode() {
+			return hash;
+		}
+	}
+	
+	
+	
 	
 	static Layout<?> primitiveLayout(Class<?> clazz) {
 		assert clazz.isPrimitive();
@@ -154,21 +187,21 @@ class Layouts {
 	
 	static {
 		// well now it starts working
-		Layout.bindAnnotationPragma(Encoding.class, Layouts::getEncodingLayout);
-		Layout.bindAnnotationPragma(NullTerminated.class, Layouts::getNullTerminatedLayout);
-		Layout.bindAnnotationPragma(Length.class, Layouts::getLengthLayout);
-		Layout.bindAnnotationPragma(UnsignedByte.class, Layouts::getUnsignedByteLayout);
-		Layout.bindAnnotationPragma(UnsignedShort.class, Layouts::getUnsignedShortLayout);
+		Layout.bindAnnotationPragma(Encoding.class, String.class, Layouts::getEncodingLayout);
+		Layout.bindAnnotationPragma(NullTerminated.class, String.class, Layouts::getNullTerminatedLayout);
+		Layout.bindAnnotationPragma(Length.class, String.class, Layouts::getLengthLayout);
+		Layout.bindAnnotationPragma(UnsignedByte.class, int.class, Layouts::getUnsignedByteLayout);
+		Layout.bindAnnotationPragma(UnsignedShort.class, int.class, Layouts::getUnsignedShortLayout);
 	}
 	
 	private static StringLayout getEncodingLayout(StringLayout l, Encoding encoding, Class<String> cls) {
 		//noinspection DataFlowIssue
-		if (!(l instanceof StringLayout) || cls != String.class)
+		if (!(l instanceof StringLayout))
 			throw new IllegalArgumentException("Incomparable annotation: " + encoding);
 		return l.updateEncoding(StringEncoding.get(encoding.value()));
 	}
 	private static StringLayout getNullTerminatedLayout(StringLayout l, NullTerminated nullTerminated, Class<String> cls) {
-		if (!(l instanceof StringLayout.DynamicStringLayout) || cls != String.class)
+		if (!(l instanceof StringLayout.DynamicStringLayout))
 			throw new IllegalArgumentException("Incomparable annotation: " + nullTerminated);
 		return ((StringLayout.DynamicStringLayout)l).updateNullTerminated(nullTerminated.value());
 	}
@@ -176,13 +209,13 @@ class Layouts {
 		if (l instanceof StringLayout.DynamicStringLayout && !((StringLayout.DynamicStringLayout) l).isNullTerminated()) {
 			return l.toStaticLen(length.value());
 		}
-		if (!(l instanceof StringLayout.StaticStringLayout) || cls != String.class)
+		if (!(l instanceof StringLayout.StaticStringLayout))
 			throw new IllegalArgumentException("Incomparable annotation: " + length);
 		return ((StringLayout.StaticStringLayout)l).updateLength(length.value());
 	}
 	
 	private static Layout<Integer> getUnsignedByteLayout(Layout<Integer> l, UnsignedByte annotation, Class<Integer> cls) {
-		if (cls == int.class && l instanceof Layout.OfInt) return new Layout.OfInt() {
+		if (l instanceof Layout.OfInt) return new Layout.OfInt() {
 			@Override
 			public int read(DataInput in) throws IOException {
 				return in.readUnsignedByte();
@@ -197,7 +230,7 @@ class Layouts {
 	}
 	
 	private static Layout<Integer> getUnsignedShortLayout(Layout<Integer> l, UnsignedShort annotation, Class<Integer> cls) {
-		if (cls == int.class && l instanceof Layout.OfInt) return new Layout.OfInt() {
+		if (l instanceof Layout.OfInt) return new Layout.OfInt() {
 			@Override
 			public int read(DataInput in) throws IOException {
 				return in.readUnsignedShort();
