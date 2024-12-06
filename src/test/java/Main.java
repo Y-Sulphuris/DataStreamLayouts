@@ -16,6 +16,8 @@ public class Main {
 	private static final ByteArrayOutputStream data = new ByteArrayOutputStream(64);
 	
 	public static void main(String[] args) throws IOException {
+		
+		if (true) return;
 		DataOutputStream output = new DataOutputStream(data);
 		
 		UUID uuid = UUID.randomUUID();
@@ -37,7 +39,6 @@ public class Main {
 }
 
 
-@SuppressWarnings("FieldCanBeLocal")
 class PacketExample {
 	// so i came up with system that allows anyone to create serialization rules via field annotations
 	// FINALLY

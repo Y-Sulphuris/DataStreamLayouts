@@ -37,8 +37,8 @@ public interface Layout<T> {
 		Layouts.bindVirtual(clazz, layout); // jk
 	}
 	
-	static <A extends Annotation, T, L extends Layout<T>> void bindAnnotationPragma(Class<A> annotationType, Class<T> fieldType, AnnotationPragma<A, T, L> pragma) {
-		Layouts.registerAnnotation(annotationType, fieldType, pragma);
+	static <A extends Annotation, T, L extends Layout<T>> void bindAnnotationPragma(Class<A> annotationType, Class<T> applicableTo, AnnotationPragma<A, T, L> pragma) {
+		Layouts.registerAnnotation(annotationType, applicableTo, pragma);
 	}
 	
 	Layout.OfByte    ofByte    = new OfByte();
