@@ -65,7 +65,7 @@ class Layouts {
 		return layout;
 	}
 	
-	static <T> Layout.Of<T> get(Class<T> clazz, MethodHandles.Lookup lookup) {
+	static synchronized <T> Layout.Of<T> get(Class<T> clazz, MethodHandles.Lookup lookup) {
 		Layout.Of<T> layout = getLayoutIfExists(clazz);
 		if (layout == null) {
 			if (clazz.getName().startsWith("java."))
