@@ -16,6 +16,10 @@ class DynamicArrayLayout<T> implements ArrayLayout<T> {
 		this.elementLayout = elementLayout;
 	}
 	
+	public StaticArrayLayout<T> toStaticLen(int length) {
+		return new StaticArrayLayout<>(arrayType, elementLayout, length);
+	}
+	
 	@Override
 	public void write(T array, DataOutput out) throws IOException {
 		out.writeInt(Array.getLength(array));

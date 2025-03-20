@@ -190,29 +190,46 @@ class Layouts {
 		// well now it starts working
 		Layout.bindAnnotationPragma(Encoding.class, String.class, Layouts::getEncodingLayout);
 		Layout.bindAnnotationPragma(NullTerminated.class, String.class, Layouts::getNullTerminatedLayout);
-		Layout.bindAnnotationPragma(Length.class, String.class, Layouts::getLengthLayout);
 		Layout.bindAnnotationPragma(UnsignedByte.class, int.class, Layouts::getUnsignedByteLayout);
 		Layout.bindAnnotationPragma(UnsignedShort.class, int.class, Layouts::getUnsignedShortLayout);
+		
+		Layout.bindAnnotationPragma(Length.class, String.class, Layouts::getStringLengthLayout);
+		
+		Layout.bindAnnotationPragma(Length.class, Object[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, byte[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, boolean[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, short[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, char[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, int[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, float[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, long[].class, Layouts::getArrayLengthLayout);
+		Layout.bindAnnotationPragma(Length.class, double[].class, Layouts::getArrayLengthLayout);
 	}
 	
 	private static StringLayout getEncodingLayout(StringLayout l, Encoding encoding, Class<String> cls) {
 		//noinspection DataFlowIssue
 		if (!(l instanceof StringLayout))
-			throw new IllegalArgumentException("Incomparable annotation: " + encoding);
+			throw new IllegalArgumentException("Inappropriate annotation: " + encoding);
 		return l.updateEncoding(StringEncoding.get(encoding.value()));
 	}
 	private static StringLayout getNullTerminatedLayout(StringLayout l, NullTerminated nullTerminated, Class<String> cls) {
 		if (!(l instanceof StringLayout.DynamicStringLayout))
-			throw new IllegalArgumentException("Incomparable annotation: " + nullTerminated);
+			throw new IllegalArgumentException("Inappropriate annotation: " + nullTerminated);
 		return ((StringLayout.DynamicStringLayout)l).updateNullTerminated(nullTerminated.value());
 	}
-	private static StringLayout getLengthLayout(StringLayout l, Length length, Class<String> cls) {
+	private static StringLayout getStringLengthLayout(StringLayout l, Length length, Class<String> cls) {
 		if (l instanceof StringLayout.DynamicStringLayout && !((StringLayout.DynamicStringLayout) l).isNullTerminated()) {
 			return l.toStaticLen(length.value());
 		}
 		if (!(l instanceof StringLayout.StaticStringLayout))
-			throw new IllegalArgumentException("Incomparable annotation: " + length);
+			throw new IllegalArgumentException("Inappropriate annotation: " + length);
 		return ((StringLayout.StaticStringLayout)l).updateLength(length.value());
+	}
+	private static <T> ArrayLayout<T> getArrayLengthLayout(Layout<T> l, Length length, Class<T> cls) {
+		if (l instanceof DynamicArrayLayout) {
+			return ((DynamicArrayLayout<T>)l).toStaticLen(length.value());
+		}
+		throw new IllegalArgumentException("Inappropriate annotation: " + length);
 	}
 	
 	private static Layout<Integer> getUnsignedByteLayout(Layout<Integer> l, UnsignedByte annotation, Class<Integer> cls) {
