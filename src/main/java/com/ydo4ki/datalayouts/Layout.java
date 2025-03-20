@@ -27,7 +27,41 @@ public interface Layout<T> {
 		return of(clazz, MethodHandles.publicLookup(), annotations);
 	}
 	
+	static Layout.Of<RawObject> ofRaw(Class<?>... params) {
+		final int len = params.length;
+		Layout<?>[] layouts = new Layout[len];
+		for (int i = 0; i < len; i++) {
+			layouts[i] = Layout.of(params[i]);
+		}
+		return ofRaw(layouts);
+	}
 	
+	@SuppressWarnings("unchecked")
+	static Layout.Of<RawObject> ofRaw(Layout<?>... params) {
+		int size = Layouts.sum(params, Layout::size);
+		return new Layout.Of<RawObject>() {
+			@Override
+			public Integer size() {
+				return size;
+			}
+			
+			@Override
+			public void write(RawObject x, DataOutput out) throws IOException {
+				for (int i = 0; i < params.length; i++) {
+					((Layout.Of<Object>)params[i].asObjectLayout()).write(x.get(i), out);
+				}
+			}
+			
+			@Override
+			public RawObject read(DataInput in) throws IOException {
+				RawObjectImpl obj = new RawObjectImpl(params.length);
+				for (int i = 0; i < params.length; i++) {
+					obj.data[i] = ((Layout.Of<Object>)params[i].asObjectLayout()).read(in);
+				}
+				return obj;
+			}
+		};
+	}
 	
 	static <T> void bindTo(Class<T> clazz, Layout.Of<T> layout) {
 		Layouts.bind(clazz, layout);

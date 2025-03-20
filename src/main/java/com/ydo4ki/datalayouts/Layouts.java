@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @since 12/2/2024 6:05 PM
@@ -73,7 +74,7 @@ class Layouts {
 			if (clazz.isArray()) {
 				layout = new DynamicArrayLayout<>(clazz, Layout.of(clazz.getComponentType()));
 			} else {
-				layout = new ClassLayout<>(clazz, lookup);
+				layout = new ObjectLayout<>(clazz, lookup);
 			}
 			bind(clazz, layout);
 		}
@@ -242,5 +243,14 @@ class Layouts {
 			}
 		};
 		throw new IllegalArgumentException("Incomparable annotation: " + annotation);
+	}
+	
+	
+	static <T> int sum(T[] array, Function<T, Integer> mapper) {
+		int sum = 0;
+		for (T t : array) {
+			sum += mapper.apply(t);
+		}
+		return sum;
 	}
 }

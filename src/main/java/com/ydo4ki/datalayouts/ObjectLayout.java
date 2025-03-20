@@ -10,12 +10,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
-// this must be writable to a stream itself btw
+// this should be writable to a stream itself btw
 /**
  * @since 12/1/2024 10:43 PM
  * @author Sulphuris
  */
-class ClassLayout<T> implements Layout.Of<T> {
+class ObjectLayout<T> implements Layout.Of<T> {
 	private final Class<T> clazz;
 	private final MethodHandle constructor;
 	private final MethodHandle[] getters;
@@ -27,7 +27,7 @@ class ClassLayout<T> implements Layout.Of<T> {
 		return fieldLayouts.length;
 	}
 	
-	ClassLayout(Class<T> clazz, MethodHandles.Lookup lookup) {
+	ObjectLayout(Class<T> clazz, MethodHandles.Lookup lookup) {
 		this.clazz = clazz;
 		ArrayList<Field> fields = collectFields(clazz);
 		try {
