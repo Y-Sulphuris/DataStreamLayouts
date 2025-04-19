@@ -29,11 +29,6 @@ class PacketExample {
 		this.very_long_code_idk = long_code_idk;
 	}
 	
-	// it's necessary to have no args constructor
-	private PacketExample() {
-		this("", null, 0, 0, 0);
-	}
-	
 	static final Layout.Of<PacketExample> layout = Layout.of(PacketExample.class, MethodHandles.lookup());
 	
 	public void send(DataOutputStream out) throws IOException {

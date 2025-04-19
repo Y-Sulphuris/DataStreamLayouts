@@ -16,8 +16,6 @@ public class Main {
 	private static final ByteArrayOutputStream data = new ByteArrayOutputStream(64);
 	
 	public static void main(String[] args) throws IOException {
-		
-		if (true) return;
 		DataOutputStream output = new DataOutputStream(data);
 		
 		UUID uuid = UUID.randomUUID();
@@ -62,11 +60,6 @@ class PacketExample {
 		this.code = code;
 		this.other_code = other_code;
 		this.very_long_code_idk = long_code_idk;
-	}
-	
-	// I want unsafe.allocateInstance by reflection =<
-	public PacketExample() {
-		this("", UUID.randomUUID(), 0,0,0);
 	}
 	
 	static final Layout.Of<PacketExample> layout = Layout.of(PacketExample.class, MethodHandles.lookup());

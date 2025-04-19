@@ -1,5 +1,8 @@
 package com.ydo4ki.datalayouts;
 
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -17,7 +20,7 @@ import java.util.*;
  */
 class ObjectLayout<T> implements Layout.Of<T> {
 	private final Class<T> clazz;
-	private final MethodHandle constructor;
+	private final Objenesis objenesis;
 	private final MethodHandle[] getters;
 	private final MethodHandle[] setters;
 	private final Layout<?>[] fieldLayouts;
@@ -33,7 +36,7 @@ class ObjectLayout<T> implements Layout.Of<T> {
 		try {
 			this.getters = find(fields, lookup, MethodHandles.Lookup::unreflectGetter);
 			this.setters = find(fields, lookup, MethodHandles.Lookup::unreflectSetter);
-			this.constructor = lookup.findConstructor(clazz, MethodType.methodType(void.class)); // wow i didn't expect that already
+			this.objenesis = new ObjenesisStd();
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -113,11 +116,10 @@ class ObjectLayout<T> implements Layout.Of<T> {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public T read(DataInput in) throws IOException {
 		try {
-			T newInstance = (T) constructor.invoke();
+			T newInstance = objenesis.newInstance(clazz);
 			
 			for (int i = 0, Len = fieldsCount(); i < Len; i++) {
 				read(fieldLayouts[i], newInstance, setters[i], in);
