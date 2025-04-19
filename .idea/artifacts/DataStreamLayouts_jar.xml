@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/DataStreamLayouts_jar</output-path>
     <root id="archive" name="DataStreamLayouts.jar">
       <element id="module-output" name="DataStreamLayouts" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/objenesis/objenesis/3.4/objenesis-3.4.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

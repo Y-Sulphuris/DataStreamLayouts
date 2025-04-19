@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * @since 12/2/2024 6:05 PM
+ * @since 1.0.0
  * @author Sulphuris
  */
 class Layouts {
@@ -150,7 +150,9 @@ class Layouts {
 	}
 	
 	
-	
+	/**
+	 * @since 1.1.0
+	 */
 	private static final class UUIDLayout implements Layout.Of<UUID> {
 		
 		@Override
@@ -247,6 +249,9 @@ class Layouts {
 		throw new IllegalArgumentException("Incomparable annotation: " + annotation);
 	}
 	
+	/**
+	 * @since 1.1.0
+	 */
 	private static Layout<Integer> getUnsignedShortLayout(Layout<Integer> l, UnsignedShort annotation, Class<Integer> cls) {
 		if (l instanceof Layout.OfInt) return new Layout.OfInt() {
 			@Override
@@ -262,7 +267,7 @@ class Layouts {
 		throw new IllegalArgumentException("Incomparable annotation: " + annotation);
 	}
 	
-	
+	// what on the earth are you doing here
 	static <T> int sum(T[] array, Function<T, Integer> mapper) {
 		int sum = 0;
 		for (T t : array) {
