@@ -1,6 +1,14 @@
 # DataStreamLayouts
-Simple java library that automates sending objects via DataOutput and DataInput streams<br>
+Simple java library that automates sending objects via DataOutput and DataInput streams
 
+Maven dependency:
+```xml
+<dependency>
+    <groupId>com.ydo4ki</groupId>
+    <artifactId>DataStreamLayouts</artifactId>
+    <version>1.2.1</version>
+</dependency>
+```
 
 Usage example:
 
