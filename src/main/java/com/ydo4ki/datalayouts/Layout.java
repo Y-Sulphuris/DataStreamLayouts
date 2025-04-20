@@ -5,6 +5,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
+import java.util.OptionalInt;
 
 /**
  * The core interface for defining data layouts that can be serialized to and deserialized from binary streams.
@@ -88,24 +90,26 @@ public interface Layout<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	static Layout.Of<RawObject> ofRaw(Layout<?>... params) {
-		int size = Layouts.sum(params, Layout::size);
+		OptionalInt size = Layouts.totalSize(params);
+		
 		return new Layout.Of<RawObject>() {
 			@Override
-			public Integer size() {
+			public OptionalInt size() {
 				return size;
 			}
 			
 			@Override
 			public void write(RawObject x, DataOutput out) throws IOException {
-				for (int i = 0; i < params.length; i++) {
+				for (int i = 0, Len = params.length; i < Len; i++) {
 					((Layout.Of<Object>)params[i].asObjectLayout()).write(x.get(i), out);
 				}
 			}
 			
 			@Override
 			public RawObject read(DataInput in) throws IOException {
-				RawObjectImpl obj = new RawObjectImpl(params.length);
-				for (int i = 0; i < params.length; i++) {
+				int Len = params.length;
+				RawObjectImpl obj = new RawObjectImpl(Len);
+				for (int i = 0; i < Len; i++) {
 					obj.data[i] = ((Layout.Of<Object>)params[i].asObjectLayout()).read(in);
 				}
 				return obj;
@@ -195,7 +199,7 @@ public interface Layout<T> {
 	 * @return The size in bytes, or null if the size is dynamic
 	 * @since 1.0.0
 	 */
-	Integer size();
+	OptionalInt size();
 	
 	/**
 	 * Converts this layout to an object layout.
@@ -264,7 +268,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		default Local __local() {
+		default Layouts.Local __local() {
 			return null;
 		}
 	}
@@ -280,8 +284,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 1;
+		public OptionalInt size() {
+			return OptionalInt.of(1);
 		}
 		
 		// it's a singleton anyway so doesn't matter
@@ -297,8 +301,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 1;
+			public OptionalInt size() {
+				return OptionalInt.of(1);
 			}
 		};
 		
@@ -308,7 +312,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -348,8 +352,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 1;
+		public OptionalInt size() {
+			return OptionalInt.of(1);
 		}
 		
 		private final Of<Boolean> object = new Of<Boolean>() {
@@ -364,8 +368,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 1;
+			public OptionalInt size() {
+				return OptionalInt.of(1);
 			}
 		};
 		
@@ -376,7 +380,7 @@ public interface Layout<T> {
 		
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -416,8 +420,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 2;
+		public OptionalInt size() {
+			return OptionalInt.of(2);
 		}
 		
 		private final Of<Short> object = new Of<Short>() {
@@ -432,8 +436,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 2;
+			public OptionalInt size() {
+				return OptionalInt.of(2);
 			}
 		};
 		
@@ -443,7 +447,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -483,8 +487,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 2;
+		public OptionalInt size() {
+			return OptionalInt.of(2);
 		}
 		
 		private final Of<Character> object = new Of<Character>() {
@@ -499,8 +503,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 2;
+			public OptionalInt size() {
+				return OptionalInt.of(2);
 			}
 		};
 		
@@ -510,7 +514,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -550,8 +554,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 4;
+		public OptionalInt size() {
+			return OptionalInt.of(4);
 		}
 		
 		private final Of<Integer> object = new Of<Integer>() {
@@ -566,8 +570,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 4;
+			public OptionalInt size() {
+				return OptionalInt.of(4);
 			}
 		};
 		
@@ -577,7 +581,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -617,8 +621,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 4;
+		public OptionalInt size() {
+			return OptionalInt.of(4);
 		}
 		
 		private final Of<Float> object = new Of<Float>() {
@@ -633,8 +637,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 4;
+			public OptionalInt size() {
+				return OptionalInt.of(4);
 			}
 		};
 		
@@ -645,7 +649,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -685,8 +689,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 8;
+		public OptionalInt size() {
+			return OptionalInt.of(8);
 		}
 		
 		private final Of<Long> object = new Of<Long>() {
@@ -701,8 +705,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 8;
+			public OptionalInt size() {
+				return OptionalInt.of(8);
 			}
 		};
 		
@@ -713,7 +717,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -753,8 +757,8 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Integer size() {
-			return 8;
+		public OptionalInt size() {
+			return OptionalInt.of(8);
 		}
 		
 		private final Of<Double> object = new Of<Double>() {
@@ -769,8 +773,8 @@ public interface Layout<T> {
 			}
 			
 			@Override
-			public Integer size() {
-				return 8;
+			public OptionalInt size() {
+				return OptionalInt.of(8);
 			}
 		};
 		
@@ -780,7 +784,7 @@ public interface Layout<T> {
 		}
 		
 		@Override
-		public Local __local() {
+		public Layouts.Local __local() {
 			return null;
 		}
 		
@@ -809,6 +813,6 @@ public interface Layout<T> {
 		}
 	}
 	
-	Local __local();
+	Layouts.Local __local();
 }
 

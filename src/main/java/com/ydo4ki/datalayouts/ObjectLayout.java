@@ -34,7 +34,7 @@ class ObjectLayout<T> implements Layout.Of<T> {
 	private final MethodHandle[] getters;
 	private final MethodHandle[] setters;
 	private final Layout<?>[] fieldLayouts;
-	private final Integer sizeof;
+	private final OptionalInt sizeof;
 	
 	/**
 	 * Returns the number of fields in this object layout.
@@ -71,17 +71,8 @@ class ObjectLayout<T> implements Layout.Of<T> {
 		
 		this.fieldLayouts = toLayouts(fields);
 		
-		Integer size = 0;
-		for (Layout<?> fieldLayout : fieldLayouts) {
-			Integer fieldSize = fieldLayout.size();
-			if (fieldSize == null) {
-				size = null;
-				break;
-			}
-			size += fieldSize;
-		}
 		
-		this.sizeof = size;
+		this.sizeof = Layouts.totalSize(fieldLayouts);
 	}
 	
 	/**
@@ -303,7 +294,7 @@ class ObjectLayout<T> implements Layout.Of<T> {
 	 * @since 1.0.0
 	 */
 	@Override
-	public Integer size() {
+	public OptionalInt size() {
 		return sizeof;
 	}
 	

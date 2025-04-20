@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.OptionalInt;
 
 /**
  * A layout implementation for arrays with a fixed length.
@@ -93,9 +94,9 @@ final class StaticArrayLayout<T> extends DynamicArrayLayout<T> {
 	 * @since 1.0.0
 	 */
 	@Override
-	public Integer size() {
-		Integer elementSize = elementLayout().size();
-		if (elementSize == null) return null;
-		return elementSize * length;
+	public OptionalInt size() {
+		OptionalInt elementSize = elementLayout().size();
+		if (!elementSize.isPresent()) return OptionalInt.empty();
+		return OptionalInt.of(elementSize.getAsInt() * length);
 	}
 }

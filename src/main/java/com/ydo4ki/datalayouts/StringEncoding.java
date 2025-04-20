@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalInt;
 
 /**
  * Abstract base class for string character encodings.
@@ -61,7 +62,7 @@ public abstract class StringEncoding extends Layout.OfChar {
 	 * @since 1.0.0
 	 */
 	@Override
-	public abstract Integer size();
+	public abstract OptionalInt size();
 	
 	static {
 		registerEncoding(new UTF8(), "utf-8");
@@ -89,8 +90,8 @@ public abstract class StringEncoding extends Layout.OfChar {
 		 * @since 1.0.0
 		 */
 		@Override
-		public Integer size() {
-			return 2;
+		public OptionalInt size() {
+			return OptionalInt.of(2);
 		}
 	}
 	
@@ -112,8 +113,8 @@ public abstract class StringEncoding extends Layout.OfChar {
 		 * @since 1.0.0
 		 */
 		@Override
-		public Integer size() {
-			return 1;
+		public OptionalInt size() {
+			return OptionalInt.of(1);
 		}
 		
 		/**

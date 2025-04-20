@@ -167,8 +167,8 @@ class Layouts {
 		}
 		
 		@Override
-		public Integer size() {
-			return 16;
+		public OptionalInt size() {
+			return OptionalInt.of(16);
 		}
 	}
 	
@@ -267,6 +267,18 @@ class Layouts {
 		throw new IllegalArgumentException("Incomparable annotation: " + annotation);
 	}
 	
+	static OptionalInt totalSize(Layout<?>[] layouts) {
+		int size = 0;
+		for (Layout<?> fieldLayout : layouts) {
+			OptionalInt fieldSize = fieldLayout.size();
+			if (!fieldSize.isPresent()) {
+				return OptionalInt.empty();
+			}
+			size += fieldSize.getAsInt();
+		}
+		return OptionalInt.of(size);
+	}
+	
 	// what on the earth are you doing here
 	static <T> int sum(T[] array, Function<T, Integer> mapper) {
 		int sum = 0;
@@ -274,5 +286,9 @@ class Layouts {
 			sum += mapper.apply(t);
 		}
 		return sum;
+	}
+	
+	// sealed interface lifehack
+	static class Local {
 	}
 }

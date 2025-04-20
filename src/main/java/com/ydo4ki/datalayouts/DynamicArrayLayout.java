@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.OptionalInt;
 
 /**
  * A layout implementation for arrays with dynamic length.
@@ -107,8 +108,8 @@ class DynamicArrayLayout<T> implements ArrayLayout<T> {
 	 * @since 1.0.0
 	 */
 	@Override
-	public Integer size() {
-		return null;
+	public OptionalInt size() {
+		return OptionalInt.empty();
 	}
 	
 	/**

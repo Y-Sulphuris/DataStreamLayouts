@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.OptionalInt;
 
 /**
  * Abstract base class for layouts that represent strings.
@@ -48,8 +49,8 @@ public abstract class StringLayout implements Layout.Of<String> {
 	 * @since 1.0.0
 	 */
 	@Override
-	public Integer size() {
-		return null;
+	public OptionalInt size() {
+		return OptionalInt.empty();
 	}
 	
 	/**

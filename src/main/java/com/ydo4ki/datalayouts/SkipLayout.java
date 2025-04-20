@@ -3,6 +3,7 @@ package com.ydo4ki.datalayouts;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.OptionalInt;
 
 /**
  * A layout implementation for skipping a specified number of bytes in a data stream.
@@ -67,7 +68,7 @@ class SkipLayout implements Layout.Of<Void> {
 	 * @since 1.1.0
 	 */
 	@Override
-	public Integer size() {
-		return bytes;
+	public OptionalInt size() {
+		return OptionalInt.of(bytes);
 	}
 }
