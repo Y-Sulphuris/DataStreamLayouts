@@ -6,7 +6,7 @@
 
     <groupId>com.ydo4ki</groupId>
     <artifactId>DataStreamLayouts</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 
     <name>DataStreamsLayout</name>
     <description>Library for fast objects serialization to DataInput/DataOutput via MethodHandles</description>

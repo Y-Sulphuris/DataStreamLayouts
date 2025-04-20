@@ -26,14 +26,14 @@ It uses MethodHandles for efficient field access, and provides a flexible layout
 <dependency>
     <groupId>com.ydo4ki</groupId>
     <artifactId>DataStreamLayouts</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'com.ydo4ki:DataStreamLayouts:1.2.1'
+implementation 'com.ydo4ki:DataStreamLayouts:1.2.2'
 ```
 
 ## Usage
