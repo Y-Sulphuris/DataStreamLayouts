@@ -6,7 +6,7 @@
 
     <groupId>com.ydo4ki</groupId>
     <artifactId>DataStreamLayouts</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
 
     <name>DataStreamsLayout</name>
     <description>Library for fast objects serialization to DataInput/DataOutput via MethodHandles</description>
@@ -34,13 +34,14 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <doclint>none</doclint>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
-            <version>3.4</version>
+            <version>3.6</version>
         </dependency>
     </dependencies>
 
@@ -49,7 +50,7 @@
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.7.0</version>
+                <version>0.11.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>

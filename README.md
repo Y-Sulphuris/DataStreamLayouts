@@ -1,9 +1,11 @@
 # DataStreamLayouts
+![Java](https://img.shields.io/badge/Java-1.8-ED8B00?logo=openjdk&logoColor=white)
+[![Maven Central](https://img.shields.io/maven-central/v/com.ydo4ki/DataStreamLayouts?label=Maven%20Central)](https://central.sonatype.com/artifact/com.ydo4ki/DataStreamLayouts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Java library that simplifies serialization and deserialization of objects using `DataOutput` and `DataInput` streams.
 It provides a type-safe, efficient way to handle binary data formats with minimal boilerplate code.
-(The main purpose of this is to simplify creation of packet classes in networking)
+(The main purpose of this is to simplify creation of packet classes in networking).
 
 ## Overview
 
@@ -12,11 +14,11 @@ It uses MethodHandles for efficient field access, and provides a flexible layout
 
 ### Key Features
 
-- **Automatic serialization** of Java objects with minimal code
-- **Support for all primitive types** and common objects like String and UUID
-- **Custom layouts** for special serialization needs
-- **Annotations** for fine-tuning serialization behavior
-- ~~**Depends on** objenesis~~ **Bonus:** extra Objenesis library x1 as a gift
+- **Automatic serialization** of Java objects with minimal code;
+- **Support for all primitive types** and common objects like String and UUID;
+- **Custom layouts** for special serialization needs;
+- **Annotations** for fine-tuning serialization behavior;
+- ~~**Depends on** objenesis~~ **Bonus:** extra Objenesis library x1 as a gift.
 
 ## Installation
 
@@ -26,14 +28,14 @@ It uses MethodHandles for efficient field access, and provides a flexible layout
 <dependency>
     <groupId>com.ydo4ki</groupId>
     <artifactId>DataStreamLayouts</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```groovy
-implementation 'com.ydo4ki:DataStreamLayouts:1.2.2'
+implementation 'com.ydo4ki:DataStreamLayouts:1.2.3'
 ```
 
 ## Usage
@@ -209,13 +211,13 @@ private String customEncodedString;
 
 ## Performance Considerations
 
-- DataStreamLayouts uses MethodHandles for efficient field access
-- Layouts are typically created once and reused for multiple operations
-- Static layouts (fixed size) can be more efficient than dynamic layouts
+- DataStreamLayouts uses MethodHandles for efficient field access;
+- Layouts are typically created once and reused for multiple operations;
+- Static layouts (fixed size) can be more efficient than dynamic layouts.
 
 ## Limitations
 
-- All fields must be accessible (public or accessible via MethodHandle Lookup that you passed to Layout::of)
+- All fields must be accessible (public or accessible via MethodHandle Lookup that you passed to `Layout::of`)
 - Circular references are not handled automatically
 - Inheritance requires special handling for virtual layouts (in case if you want to create common layout for all subclasses)
 
@@ -226,9 +228,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.<br>
-<sub><sup>why am i even writing this 😭😭</sup></sub>
+<sub><sup>why am i even writing this ~.~</sup></sub>
 
 ## Support
 
-If you encounter any issues or have questions, please open an issue on the project repository.<br>
+If you encounter any issues or have any questions, please open an issue on the project repository.<br>
 I will probably solve it. Someday definitely.
